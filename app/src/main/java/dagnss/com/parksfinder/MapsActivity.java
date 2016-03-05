@@ -1,5 +1,6 @@
 package dagnss.com.parksfinder;
 
+import dagnss.com.eventsDB.*;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
@@ -11,12 +12,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.microsoft.windowsazure.mobileservices.*;
 
+
+
 import java.net.MalformedURLException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private MobileServiceClient mClient;
+
+    private Event_Manager eventManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,15 +32,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        try {
+        try{
             mClient = new MobileServiceClient(
                     "https://sportyevents.azure-mobile.net/",
                     "AxZxcxblWqLJxImvALWxqJOIAdMrhe94",
                     this
             );
-        } catch (MalformedURLException e) {
+            eventManager = new Event_Manager(mClient);
+        }catch(Exception e){
             e.printStackTrace();
         }
+
     }
 
 
