@@ -9,10 +9,14 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.microsoft.windowsazure.mobileservices.*;
+
+import java.net.MalformedURLException;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private MobileServiceClient mClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +26,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        try {
+            mClient = new MobileServiceClient(
+                    "https://sportyevents.azure-mobile.net/",
+                    "AxZxcxblWqLJxImvALWxqJOIAdMrhe94",
+                    this
+            );
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
     }
 
 
