@@ -18,15 +18,15 @@ public class Event_Manager {
 
     public MobileServiceList<events> getEventBySport(String sport){
         MobileServiceList<events> result = null;
+        updateTable();
+
+
         try{
             result = mEventTable.where().field("type").eq(sport).execute().get();
         }
         catch(Exception e) {
             e.printStackTrace();
         }
-
-        updateTable();
-
         return result;
     }
 
@@ -41,6 +41,18 @@ public class Event_Manager {
         return result;
     }
     */
+
+    public MobileServiceList<events> getAllEvents(){
+        MobileServiceList<events> result = null;
+        updateTable();
+        try {
+            result = mEventTable.execute().get();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
     public void createEvent(String type, String desc, double eLat, double eLong){
         events e = new events();
