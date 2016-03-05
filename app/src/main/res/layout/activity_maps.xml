@@ -5,4 +5,43 @@
     android:name="com.google.android.gms.maps.SupportMapFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="dagnss.com.parksfinder.MapsActivity" />
+    tools:context="dagnss.com.parksfinder.MapsActivity" >
+
+
+
+
+
+    <Button
+        android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+          android:text="Tennis"
+        android:layout_marginTop="60dp"
+         />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:text="Soccer"
+        android:layout_marginTop="100dp"
+       />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|top"
+        android:text="Baseball"
+        android:layout_marginTop="140dp"
+        />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|top"
+        android:text="Submit"
+        android:layout_marginTop="350dp"
+        />
+
+</fragment>
