@@ -13,39 +13,6 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:elevation="4dp"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
-
-    <Button
-        android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top"
-          android:text="Tennis"
-        android:layout_marginTop="60dp"
-         />
-
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top"
-        android:text="Soccer"
-        android:layout_marginTop="100dp"
-       />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top"
-        android:text="Baseball"
-        android:layout_marginTop="140dp"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right|top"
-        android:text="Submit"
-        android:layout_marginTop="350dp"
-        />
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
 
 </fragment>
