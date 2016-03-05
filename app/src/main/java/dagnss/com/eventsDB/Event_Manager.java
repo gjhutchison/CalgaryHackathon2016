@@ -1,6 +1,7 @@
 package dagnss.com.eventsDB;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.microsoft.windowsazure.mobileservices.*;
 import com.microsoft.windowsazure.mobileservices.table.MobileServiceTable;
@@ -25,18 +26,27 @@ public class Event_Manager {
         eList = new ArrayList<events>();
     }
 
-    public MobileServiceList<events> getEventBySport(String sport){
-        MobileServiceList<events> result = null;
-        updateTable();
-
-
-        try{
-            result = mEventTable.where().field("type").eq(sport).execute().get();
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-        }
-        return result;
+    public void getEventBySport(String sport){
+        final String s = sport;
+        setSafe(false);
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params){
+                MobileServiceList<events> result = null;
+                try{
+                    result = mEventTable.where().field("type").eq(s).execute().get();
+                    eList.clear();
+                    for(events event : result){
+                        eList.add(event);
+                    }
+                    setSafe(true);
+                }
+                catch(Exception e) {
+                    Log.e("ERROR", "Failed to get all "+s+" Events");
+                }
+                return null;
+            }
+        }.execute();
     }
 
     /*
@@ -116,7 +126,7 @@ public class Event_Manager {
                     setSafe(true);
                 }
                 catch(Exception e) {
-                    e.printStackTrace();
+                    Log.e("ERROR","Failed to get all Events");
                 }
                 return null;
             }
