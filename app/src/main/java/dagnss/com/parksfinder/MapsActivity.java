@@ -1,5 +1,6 @@
 package dagnss.com.parksfinder;
 
+import dagnss.com.eventsDB.*;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,10 +12,18 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.microsoft.windowsazure.mobileservices.*;
+
+
+
+import java.net.MalformedURLException;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private MobileServiceClient mClient;
+
+    private Event_Manager eventManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +34,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+	try{
+            mClient = new MobileServiceClient(
+                    "https://sportyevents.azure-mobile.net/",
+                    "AxZxcxblWqLJxImvALWxqJOIAdMrhe94",
+                    this
+            );
+            eventManager = new Event_Manager(mClient);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+	
         initToolBar();
 
     }
@@ -34,6 +55,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     {
         getMenuInflater().inflate(R.menu.menu_buttons, menu);
         return true;
+
     }
 
     private void initToolBar()
