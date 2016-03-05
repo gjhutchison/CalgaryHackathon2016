@@ -1,3 +1,10 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="0dp"
+    android:paddingRight="0dp"
+    android:paddingTop="0dp"
+    android:paddingBottom="0dp" tools:context=".MainActivity">
+
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -15,37 +22,29 @@
         android:elevation="4dp"
         android:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
-    <Button
-        android:layout_width="wrap_content"
-         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top"
-          android:text="Tennis"
-        android:layout_marginTop="60dp"
-         />
 
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top"
-        android:text="Soccer"
-        android:layout_marginTop="100dp"
-       />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal|top"
-        android:text="Baseball"
-        android:layout_marginTop="140dp"
-        />
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="right|top"
-        android:text="Submit"
-        android:layout_marginTop="350dp"
-        />
 
 </fragment>
+
+
+<LinearLayout
+android:orientation="vertical"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+android:weightSum="1"
+android:layout_alignParentTop="true"
+android:layout_alignParentLeft="true"
+android:layout_alignParentStart="true">
+
+    <EditText
+        android:layout_width="221dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/location_input"
+        android:layout_gravity="center_horizontal" />
+
+
+</LinearLayout>
+
+
+
+    </RelativeLayout>
