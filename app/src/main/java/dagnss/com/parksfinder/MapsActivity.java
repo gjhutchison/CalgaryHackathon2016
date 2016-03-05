@@ -1,12 +1,20 @@
 package dagnss.com.parksfinder;
 
 import dagnss.com.eventsDB.*;
+
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -23,7 +31,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private MobileServiceClient mClient;
-
+    LocationManager locationManager;
+    LatLng currLoc;
     private Event_Manager eventManager;
 
     @Override
@@ -80,7 +89,31 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+        if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        else {
+            double longitude = 0;
+            double latitude = 0;
+            LocationRequest mLocationRequest = LocationRequest.create();
+
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+                String locLat = String.valueOf(latitude) + "," + String.valueOf(longitude);
+                currLoc = new LatLng(latitude, longitude);
+                MarkerOptions mkrOpt = new MarkerOptions();
+                if (mMap != null) {
+                    mMap.addMarker(mkrOpt.position(currLoc).title("YOU!"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 11));
+                }
+            }
+        }
+        //eventManager.createEvent("Hockey", "A brutal sport", currLoc.latitude, currLoc.longitude);
+        MobileServiceList<events> e = eventManager.getEventBySport("Hockey");
         // Add a marker in Sydney and move the camera
 
         /*
