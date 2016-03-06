@@ -35,6 +35,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.microsoft.windowsazure.mobileservices.*;
@@ -203,6 +204,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 String locLat = String.valueOf(latitude) + "," + String.valueOf(longitude);
                 currLoc = new LatLng(latitude, longitude);
                 MarkerOptions mkrOpt = new MarkerOptions();
+
                 if (mMap != null) {
                     mMap.addMarker(mkrOpt.position(currLoc).title("YOU!"));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 11));
@@ -301,7 +303,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 LatLng eloc = new LatLng(e.lati, e.longi);
                 MarkerOptions mkrOpt = new MarkerOptions();
                 if (mMap != null) {
-                    mMap.addMarker(mkrOpt.position(eloc).title(e.type + ": " + e.description));
+                    mMap.addMarker(mkrOpt.position(eloc).title(e.type + ": " + e.description).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
                 }
             }
         }
