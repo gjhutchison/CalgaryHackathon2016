@@ -26,7 +26,7 @@ public class KMLParser
     private ArrayList<KmlPlacemark> m_VolleyballList = new ArrayList<>();
     private ArrayList<KmlPlacemark> m_IceSkateList = new ArrayList<>();
 
-    private KMLParser(){}
+    //private KMLParser(){}
     public KMLParser( GoogleMap map, Context mapContext )
     {
         m_map = map;

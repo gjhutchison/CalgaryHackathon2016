@@ -44,6 +44,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private Event_Manager eventManager;
 
     private Sport currentlySelected = Sport.Soccer;
+    private boolean initialLoad = true;
+    private KMLParser parser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
 	
         initToolBar();
-
+        parser = new KMLParser(mMap, getApplicationContext());
     }
 
     @Override
@@ -126,6 +128,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         */
+
+            parser.loadKML(mMap, getApplicationContext());
 
     }
 
