@@ -108,13 +108,18 @@ public class Event_Manager {
 
 
     public void getAllEvents(){
+        Log.i("SANITY","Dropping a log");
         setSafe(false);
         new AsyncTask<Void, Void, Void>(){
             @Override
             protected Void doInBackground(Void... params){
+                Log.i("ENTERED","Started getting events");
                 MobileServiceList<events> result = null;
                 try{
+
                     result = mEventTable.execute().get();
+                    Log.i("RESULT",""+result.getTotalCount());
+
                     eList.clear();
                     for(events event : result){
                         if(event == null){
@@ -194,6 +199,7 @@ public class Event_Manager {
                 return;
             }
         }.execute();
+        //setSafe(true);
     }
 
     public void createEvent(String type, String desc, double eLat, double eLong){

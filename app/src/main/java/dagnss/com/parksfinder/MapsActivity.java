@@ -2,7 +2,14 @@ package dagnss.com.parksfinder;
 
 import dagnss.com.eventsDB.*;
 
+import android.Manifest;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -17,7 +24,10 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.os.AsyncTask;
 
+
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -52,6 +62,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     private GoogleMap mMap;
     private MobileServiceClient mClient;
+    LocationManager locationManager;
+    LatLng currLoc;
     private EditText result;
     private final LatLng CalgaryCentre = new LatLng( 51.045, -114.057222 );
 
@@ -87,17 +99,49 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById( R.id.map );
         mapFragment.getMapAsync( this );
 
+	    try{
+            mClient = new MobileServiceClient(
+                    "https://sportyevents.azure-mobile.net/",
+                    "AxZxcxblWqLJxImvALWxqJOIAdMrhe94",
+                    this
+            );
+            eventManager = new Event_Manager(mClient);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
-//	    try{
-//            mClient = new MobileServiceClient(
-//                    "https://sportyevents.azure-mobile.net/",
-//                    "AxZxcxblWqLJxImvALWxqJOIAdMrhe94",
-//                    this
-//            );
-//            eventManager = new Event_Manager(mClient);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+            // Check if we were successful in obtaining the map.
+            if (mMap != null) {
+
+
+                mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+
+                    @Override
+                    public void onMyLocationChange(Location arg0) {
+                        // TODO Auto-generated method stub
+                        LatLng latLng = new LatLng(arg0.getLatitude(), arg0.getLongitude());
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                        //mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                    }
+                });
+
+            }}
 
 
         initToolBar();
@@ -164,7 +208,35 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public void onMapReady( GoogleMap googleMap )
     {
         mMap = googleMap;
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
+        if (ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        else {
+            double longitude = 0;
+            double latitude = 0;
+            LocationRequest mLocationRequest = LocationRequest.create();
+
+            Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (location != null) {
+                longitude = location.getLongitude();
+                latitude = location.getLatitude();
+                String locLat = String.valueOf(latitude) + "," + String.valueOf(longitude);
+                currLoc = new LatLng(latitude, longitude);
+                MarkerOptions mkrOpt = new MarkerOptions();
+                if (mMap != null) {
+                    mMap.addMarker(mkrOpt.position(currLoc).title("YOU!"));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currLoc, 11));
+                }
+            }
+        }
+        eventManager.getAllEvents();
+
+        new LongOperation().execute("");
+        //eventManager.createEvent("Hockey", "A brutal sport", currLoc.latitude, currLoc.longitude);
+        //getEventBySport(Sport.Baseball);
+        // Add a marker in Sydney and move the camera
         int inputRes = R.raw.calgary_sports_surfaces;
 
         if ( initialLoad )
@@ -200,6 +272,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             case R.id.action_change_location:
               /* result = (EditText) findViewById(R.id.action_change_location);*/
+
                 EditText but_location = ( EditText ) findViewById( R.id.location_input );
                 if ( but_location.getVisibility() == View.INVISIBLE )
                 {
@@ -216,6 +289,48 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             default:
                 return super.onOptionsItemSelected( item );
         }
+    }
+    private class LongOperation extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            while(!eventManager.listSafe())
+            {
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+//            ArrayList<events> evens = eventManager.getEventList();
+//            for (events e : evens) {
+//                LatLng eloc = new LatLng(e.lati, e.longi);
+//                MarkerOptions mkrOpt = new MarkerOptions();
+//                if (mMap != null) {
+//                    mMap.addMarker(mkrOpt.position(eloc).title(e.type + ": " + e.description));
+//                }
+//            }
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            ArrayList<events> evens = eventManager.getEventList();
+            for (events e : evens) {
+                LatLng eloc = new LatLng(e.lati, e.longi);
+                MarkerOptions mkrOpt = new MarkerOptions();
+                if (mMap != null) {
+                    mMap.addMarker(mkrOpt.position(eloc).title(e.type + ": " + e.description));
+                }
+            }
+        }
+
+        @Override
+        protected void onPreExecute() {}
+
+        @Override
+        protected void onProgressUpdate(Void... values) {}
     }
 
     @Override
