@@ -66,6 +66,7 @@ public class KMLParser
 
         populateLists( mainLayer.getPlacemarks() );
 
+        mainLayer.removeLayerFromMap();
         return true;
     }
 

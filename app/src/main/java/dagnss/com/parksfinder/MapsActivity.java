@@ -58,7 +58,7 @@ enum Sport
     Skating
 }
 
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener, GoogleMap.OnMarkerClickListener
 {
 
     private GoogleMap mMap;
@@ -140,7 +140,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                         // TODO Auto-generated method stub
                         if(!loaded) {
                             LatLng latLng = new LatLng(arg0.getLatitude(), arg0.getLongitude());
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                             //mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
                             loaded = true;
                         }
@@ -168,17 +168,25 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onCreateOptionsMenu( Menu menu )
     {
-        getMenuInflater().inflate( R.menu.menu_buttons, menu );
-        initSportMenu( menu.findItem( R.id.action_change_sport ) );
+        getMenuInflater().inflate(R.menu.menu_buttons, menu);
+        initSportMenu(menu.findItem(R.id.action_change_sport));
         return true;
 
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker)
+    {
+        System.out.print("HEY!\n");
+
+        return false;
     }
 
     private void initToolBar()
     {
         Toolbar myToolbar = ( Toolbar ) findViewById( R.id.my_toolbar );
         myToolbar.showOverflowMenu();
-        setSupportActionBar( myToolbar );
+        setSupportActionBar(myToolbar);
     }
 
     private void initSportMenu( MenuItem item )
@@ -188,15 +196,15 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         list.add( new ItemData( "Baseball", R.drawable.baseball ) );
         list.add( new ItemData( "Tennis", R.drawable.tennis ) );
         list.add( new ItemData( "Frisbee", R.drawable.frisbee ) );
-        list.add( new ItemData( "Basketball", R.drawable.basketball ) );
-        list.add( new ItemData( "Volleyball", R.drawable.volleyball ) );
+        list.add(new ItemData("Basketball", R.drawable.basketball));
+        list.add(new ItemData("Volleyball", R.drawable.volleyball));
         list.add( new ItemData( "Skating", R.drawable.skating ) );
 
         Spinner sp = ( Spinner ) MenuItemCompat.getActionView( item );
         ImageSpinnerAdapter adapter = new ImageSpinnerAdapter( this,
                 R.layout.image_spinner_layout, R.id.txt, list );
-        sp.setAdapter( adapter );
-        sp.setOnItemSelectedListener( this );
+        sp.setAdapter(adapter);
+        sp.setOnItemSelectedListener(this);
     }
 
     /**
@@ -254,6 +262,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         parser.loadKML( inputRes );
 
         mMap.moveCamera( CameraUpdateFactory.newLatLngZoom( CalgaryCentre, 10 ) );
+        mMap.setOnMarkerClickListener(this);
 
     }
 
@@ -387,7 +396,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // TODO: Make sure this auto-generated app deep link URI is correct.
                 Uri.parse( "android-app://dagnss.com.parksfinder/http/host/path" )
         );
-        AppIndex.AppIndexApi.start( client, viewAction );
+        AppIndex.AppIndexApi.start(client, viewAction);
     }
 
     @Override
@@ -403,9 +412,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // TODO: If you have web page content that matches this app activity's content,
                 // make sure this auto-generated web page URL is correct.
                 // Otherwise, set the URL to null.
-                Uri.parse( "http://host/path" ),
+                Uri.parse("http://host/path"),
                 // TODO: Make sure this auto-generated app deep link URI is correct.
-                Uri.parse( "android-app://dagnss.com.parksfinder/http/host/path" )
+                Uri.parse("android-app://dagnss.com.parksfinder/http/host/path")
         );
         AppIndex.AppIndexApi.end( client, viewAction );
         client.disconnect();
