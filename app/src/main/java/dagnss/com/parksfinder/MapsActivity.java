@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.os.AsyncTask;
 
@@ -64,6 +65,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private EditText result;
     private final LatLng CalgaryCentre = new LatLng( 51.045, -114.057222 );
 
+    boolean loaded = false;
     private Event_Manager eventManager;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -121,9 +123,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onMyLocationChange(Location arg0) {
                         // TODO Auto-generated method stub
-                        LatLng latLng = new LatLng(arg0.getLatitude(), arg0.getLongitude());
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                        //mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                        if(!loaded) {
+                            LatLng latLng = new LatLng(arg0.getLatitude(), arg0.getLongitude());
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                            //mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                            loaded = true;
+                        }
                     }
                 });
 
@@ -232,7 +237,21 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onItemSelected( AdapterView<?> parent, View view, int pos, long id )
     {
-
+        switch(pos)
+        {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            case 3:
+                break;
+            case 4:
+                break;
+            case 5:
+                break;
+        }
     }
 
     @Override
