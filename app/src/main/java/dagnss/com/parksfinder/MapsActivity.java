@@ -18,6 +18,8 @@ import android.view.View;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
+import android.os.AsyncTask;
+
 
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -62,16 +64,16 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-//	    try{
-//            mClient = new MobileServiceClient(
-//                    "https://sportyevents.azure-mobile.net/",
-//                    "AxZxcxblWqLJxImvALWxqJOIAdMrhe94",
-//                    this
-//            );
-//            eventManager = new Event_Manager(mClient);
-//        }catch(Exception e){
-//            e.printStackTrace();
-//        }
+	    try{
+            mClient = new MobileServiceClient(
+                    "https://sportyevents.azure-mobile.net/",
+                    "AxZxcxblWqLJxImvALWxqJOIAdMrhe94",
+                    this
+            );
+            eventManager = new Event_Manager(mClient);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
 
 	
         initToolBar();
@@ -148,8 +150,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
+        new LongOperation().execute("");
         //eventManager.createEvent("Hockey", "A brutal sport", currLoc.latitude, currLoc.longitude);
-        MobileServiceList<events> e = eventManager.getEventBySport("Hockey");
+        //getEventBySport(Sport.Baseball);
         // Add a marker in Sydney and move the camera
 
         /*
@@ -174,6 +177,40 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+    private class LongOperation extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+            eventManager.getAllEvents();
+            while(!eventManager.listSafe())
+            {
+
+            }
+            ArrayList<events> evens = eventManager.getEventList();
+            for (events e : evens) {
+                LatLng eloc = new LatLng(e.lati, e.longi);
+                MarkerOptions mkrOpt = new MarkerOptions();
+                if (mMap != null) {
+                    mMap.addMarker(mkrOpt.position(eloc).title(e.type + ": " + e.description));
+                }
+            }
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+//            TextView txt = (TextView) findViewById(R.id.output);
+//            txt.setText("Executed"); // txt.setText(result);
+            // might want to change "executed" for the returned string passed
+            // into onPostExecute() but that is upto you
+        }
+
+        @Override
+        protected void onPreExecute() {}
+
+        @Override
+        protected void onProgressUpdate(Void... values) {}
     }
 
 }
