@@ -9,6 +9,7 @@ import com.google.maps.android.kml.KmlLayer;
 import com.google.maps.android.kml.KmlPlacemark;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by Sven on 2016-03-05.
@@ -40,6 +41,7 @@ public class KMLParser
         {
             mainLayer = new KmlLayer( map, R.raw.calgary_sports_surfaces, mapContext );
             mainLayer.addLayerToMap();
+            Iterable<KmlContainer> kmlcontainer = mainLayer.getContainers();
             Log.i( "success", "Loaded KML Layer successfully." );
         } catch ( Exception e )
         {
