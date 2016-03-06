@@ -408,6 +408,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
             case R.id.action_change_sport:
                 return true;
+            case R.id.action_refresh:
+                eventManager.updateTable();
+                eventManager.getAllEvents();
+                new LongOperation().execute("");
+
+                return true;
+
             default:
                 return super.onOptionsItemSelected( item );
         }
