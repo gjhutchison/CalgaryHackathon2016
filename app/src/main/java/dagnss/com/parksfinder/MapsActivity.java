@@ -4,6 +4,7 @@ import dagnss.com.eventsDB.*;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
@@ -13,6 +14,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -79,7 +81,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ArrayList<Marker> VolleyballMarkers= new ArrayList<>();
 
     private HashMap<Sport, ArrayList<Marker>> sportsMap;
-
+    AlertDialog.Builder builder;
+    boolean yesno = false;
+    Marker currentMarker = null;
+    String EventDesc = null;
 
     private Event_Manager eventManager;
     /**
@@ -164,6 +169,34 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         sportsMap.put( Sport.Skating, IceSkateMarkers );
         sportsMap.put( Sport.Tennis, TennisMarkers );
         sportsMap.put( Sport.Volleyball, VolleyballMarkers );
+
+        builder = new AlertDialog.Builder(this);
+
+        builder.setTitle("Confirm");
+        builder.setMessage("Do you want to create an event here?");
+
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int which) {
+                // Do nothing but close the dialog
+                eventManager.createEvent(EventDesc, "New event!", currentMarker.getPosition().latitude, currentMarker.getPosition().longitude);
+                currentMarker.setIcon((BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                currentMarker.setTitle(EventDesc + ": New event!");
+                currentMarker = null;
+                EventDesc = null;
+                dialog.dismiss();
+            }
+
+        });
+
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                yesno = false;
+                dialog.dismiss();
+            }
+        });
     }
 
     @Override
@@ -178,7 +211,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public boolean onMarkerClick(Marker marker)
     {
-        System.out.print("HEY!\n");
+        String title = marker.getTitle();
+        String event[] = title.split(":");
+        if(event[0].compareTo("Type") == 0) {
+
+            currentMarker = marker;
+            EventDesc = event[1];
+            AlertDialog alert = builder.create();
+            alert.show();
+
+            return true;
+        }
 
         return false;
     }
@@ -193,11 +236,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private void initSportMenu( MenuItem item )
     {
         ArrayList<ItemData> list = new ArrayList<>();
+
+        list.add(new ItemData("Basketball", R.drawable.basketball));
         list.add( new ItemData( "Soccer", R.drawable.sport ) );
         list.add( new ItemData( "Baseball", R.drawable.baseball ) );
         list.add( new ItemData( "Tennis", R.drawable.tennis ) );
         list.add( new ItemData( "Frisbee", R.drawable.frisbee ) );
-        list.add(new ItemData("Basketball", R.drawable.basketball));
         list.add(new ItemData("Volleyball", R.drawable.volleyball));
         list.add( new ItemData( "Skating", R.drawable.skating ) );
 
@@ -274,24 +318,24 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch(pos)
         {
             case 0:
+                toggleVisibility(Sport.Basketball);
+                currentlySelected = Sport.Basketball;
+                break;
+            case 1:
                 toggleVisibility(Sport.Soccer);
                 currentlySelected = Sport.Soccer;
                 break;
-            case 1:
+            case 2:
                 toggleVisibility(Sport.Baseball);
                 currentlySelected = Sport.Baseball;
                 break;
-            case 2:
+            case 3:
                 toggleVisibility(Sport.Tennis);
                 currentlySelected = Sport.Tennis;
                 break;
-            case 3:
+            case 4:
                 toggleVisibility(Sport.Frisbee);
                 currentlySelected = Sport.Frisbee;
-                break;
-            case 4:
-                toggleVisibility(Sport.Basketball);
-                currentlySelected = Sport.Basketball;
                 break;
             case 5:
                 toggleVisibility(Sport.Volleyball);
@@ -481,7 +525,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             LatLng pos = parser.getLocation( location );
             MarkerOptions mkrOpt = new MarkerOptions();
-            Marker newMarker = mMap.addMarker( mkrOpt.position(pos) );
+            Marker newMarker = mMap.addMarker( mkrOpt.position(pos).title("Type: " + sportType) );
 
             list.add( newMarker );
         }
