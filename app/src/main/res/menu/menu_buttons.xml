@@ -6,8 +6,9 @@
         android:id="@+id/action_change_sport"
         android:icon="@drawable/sport"
         android:title="@string/action_change_sport"
+        app:actionViewClass="android.widget.Spinner"
         app:showAsAction="ifRoom"/>
-    <!-- "Change Sport", should appear as action button if possible -->
+    <!-- "Change Location", should appear as action button if possible -->
     <item
         android:id="@+id/action_change_location"
         android:icon="@drawable/location"
