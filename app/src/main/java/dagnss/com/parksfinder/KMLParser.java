@@ -3,7 +3,9 @@ package dagnss.com.parksfinder;
 import android.content.Context;
 import android.util.Log;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.maps.android.kml.KmlContainer;
 import com.google.maps.android.kml.KmlLayer;
 import com.google.maps.android.kml.KmlPlacemark;
@@ -34,14 +36,14 @@ public class KMLParser
         m_mapContext = mapContext;
     }
 
-    public boolean loadKML( GoogleMap map, Context mapContext )
+    public boolean loadKML( int inputRes )
     {
         KmlLayer mainLayer;
         try
         {
-            mainLayer = new KmlLayer( map, R.raw.calgary_sports_surfaces, mapContext );
+            mainLayer = new KmlLayer( m_map, inputRes, m_mapContext );
             mainLayer.addLayerToMap();
-            Iterable<KmlContainer> kmlcontainer = mainLayer.getContainers();
+
             Log.i( "success", "Loaded KML Layer successfully." );
         } catch ( Exception e )
         {
@@ -53,8 +55,9 @@ public class KMLParser
         ArrayList<KmlPlacemark> placemarkList = new ArrayList<>();
         Iterable<KmlPlacemark> temp = mainContainer.getPlacemarks();
 
-        for( KmlPlacemark elem : temp ){
-            placemarkList.add(elem);
+        for ( KmlPlacemark elem : temp )
+        {
+            placemarkList.add( elem );
         }
         populateLists( placemarkList );
 
@@ -136,5 +139,10 @@ public class KMLParser
         startIndex = shortened.lastIndexOf( "<td>" );
         endIndex = shortened.indexOf( "</td>" );
         return shortened.substring( startIndex + 4, endIndex );
+    }
+
+    public LatLng getLocation()
+    {
+        return new LatLng( 51, -114 );
     }
 }
