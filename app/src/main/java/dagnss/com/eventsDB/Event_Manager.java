@@ -37,6 +37,9 @@ public class Event_Manager {
                     result = mEventTable.where().field("type").eq(s).execute().get();
                     eList.clear();
                     for(events event : result){
+                        if(event == null){
+                            break;
+                        }
                         eList.add(event);
                     }
                 }
@@ -69,6 +72,10 @@ public class Event_Manager {
                     result = mEventTable.execute().get();
                     eList.clear();
                     for(events event : result){
+
+                        if(event == null){
+                            break;
+                        }
 
                         double lat2 = event.lati;
                         double lon2 = event.longi;
@@ -110,6 +117,9 @@ public class Event_Manager {
                     result = mEventTable.execute().get();
                     eList.clear();
                     for(events event : result){
+                        if(event == null){
+                            break;
+                        }
                         eList.add(event);
                     }
                 }
@@ -145,6 +155,11 @@ public class Event_Manager {
                     eList.clear();
                     double lowestDistance = -1;
                     for(int i = 0;i<result.size();i++){
+
+                        if(result.get(i) == null){
+                            break;
+                        }
+
                         double lat2 = result.get(i).lati;
                         double lon2 = result.get(i).longi;
 
