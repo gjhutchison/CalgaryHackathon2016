@@ -49,65 +49,45 @@ public class Event_Manager {
         }.execute();
     }
 
-    /*
-    public MobileServiceList<events> getEventByID(String id){
-        MobileServiceList<events> result = null;
+    public void getEventsByDistance(double dis, double lat, double lon){
 
-        try{
+        final double lat1 = lat;
+        final double lon1 = lon;
+        final double distance = dis;
 
+        setSafe(false);
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params){
+                MobileServiceList<events> result = null;
+                try{
+                    result = mEventTable.execute().get();
+                    eList.clear();
+                    for(events event : result){
+                        eList.add(event);
 
-        }catch(Exception e){
+                        double lat2 = event.lati;
+                        double lon2 = event.longi;
 
-        }
-    }
-    */
-    public MobileServiceList<events> getEventsByDistance(float distance, double lat1, double lon1){
-        MobileServiceList<events> result = null;
+                        double dLon = lon2-lon1;
+                        double dLat = lat2-lat2;
 
-        ArrayList<String> ids = new ArrayList<String>();
+                        double a = Math.pow(Math.sin(dLat/2),2)+Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(dLon/2),2);
+                        double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+                        double d = 6373 * c;
 
-    /*
-        dlon = lon2 - lon1
-        dlat = lat2 - lat1
-        a = (sin(dlat/2))^2 + cos(lat1) * cos(lat2) * (sin(dlon/2))^2
-        c = 2 * atan2( sqrt(a), sqrt(1-a) )
-        d = R * c (where R is the radius of the Earth)
-     */
-
-        try{
-            result = mEventTable.execute().get();
-
-            for(int i = 0;i<result.size();i++){
-                if(result.get(i)!=null){
-                    double lat2 = result.get(i).lati;
-                    double lon2 = result.get(i).longi;
-
-                    double dLon = lon2-lon1;
-                    double dLat = lat2-lat2;
-
-                    double a = Math.pow(Math.sin(dLat/2),2)+Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(dLon/2),2);
-                    double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
-                    double d = 6373 * c;
-
-                    if(d > distance){
-                        ids.add(result.get(i).id);
+                        if(d < distance){
+                            eList.add(event);
+                        }
                     }
+                    setSafe(true);
                 }
-            }
-
-            for(int i = 0;i<ids.size();i++){
-                for(int j = 0;j < result.size();j++){
-                    if(result.get(j).id.equals(ids.get(i))){
-                        result.remove(j);
-                        break;
-                    }
+                catch(Exception e) {
+                    Log.e("ERROR", "Failed to get events within "+distance);
                 }
+                return null;
             }
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
-        return result;
+        }.execute();
     }
 
 
