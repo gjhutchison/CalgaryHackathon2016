@@ -69,13 +69,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final LatLng CalgaryCentre = new LatLng( 51.045, -114.057222 );
 
     boolean loaded = false;
-    private ArrayList<Marker> SoccerMarkers;
-    private ArrayList<Marker> TennisMarkers;
-    private ArrayList<Marker> BaseballMarkers;
-    private ArrayList<Marker> FrisbeeMarkers;
-    private ArrayList<Marker> IceSkateMarkers;
-    private ArrayList<Marker> BasketballMarkers;
-    private ArrayList<Marker> VolleyballMarkers;
+    private ArrayList<Marker> SoccerMarkers = new ArrayList<>();
+    private ArrayList<Marker> TennisMarkers= new ArrayList<>();
+    private ArrayList<Marker> BaseballMarkers= new ArrayList<>();
+    private ArrayList<Marker> FrisbeeMarkers= new ArrayList<>();
+    private ArrayList<Marker> IceSkateMarkers= new ArrayList<>();
+    private ArrayList<Marker> BasketballMarkers= new ArrayList<>();
+    private ArrayList<Marker> VolleyballMarkers= new ArrayList<>();
 
     private HashMap<Sport, ArrayList<Marker>> sportsMap;
 
@@ -101,6 +101,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById( R.id.map );
         mapFragment.getMapAsync( this );
 
+        sportsMap = new HashMap<>();
 	    try{
             mClient = new MobileServiceClient(
                     "https://sportyevents.azure-mobile.net/",
@@ -262,16 +263,32 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         switch(pos)
         {
             case 0:
+                toggleVisibility(Sport.Soccer);
+                currentlySelected = Sport.Soccer;
                 break;
             case 1:
+                toggleVisibility(Sport.Baseball);
+                currentlySelected = Sport.Baseball;
                 break;
             case 2:
+                toggleVisibility(Sport.Tennis);
+                currentlySelected = Sport.Tennis;
                 break;
             case 3:
+                toggleVisibility(Sport.Frisbee);
+                currentlySelected = Sport.Frisbee;
                 break;
             case 4:
+                toggleVisibility(Sport.Basketball);
+                currentlySelected = Sport.Basketball;
                 break;
             case 5:
+                toggleVisibility(Sport.Volleyball);
+                currentlySelected = Sport.Volleyball;
+                break;
+            case 6:
+                toggleVisibility(Sport.Skating);
+                currentlySelected = Sport.Skating;
                 break;
         }
     }
@@ -394,9 +411,13 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         client.disconnect();
     }
 
-    public void toggleVisiblity( Sport sport )
+    public void toggleVisibility( Sport sport )
     {
         ArrayList<Marker> sportList = sportsMap.get( sport );
+        for(Marker m : sportsMap.get(currentlySelected))
+        {
+            m.setVisible(false);
+        }
 
         if ( sportList.isEmpty() )
         {
