@@ -111,6 +111,7 @@ public class Event_Manager {
                 return null;
             }
         }.execute();
+        //setSafe(true);
     }
 
     public void createEvent(String type, String desc, double eLat, double eLong){
