@@ -8,13 +8,18 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
+import android.net.Uri;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -22,6 +27,9 @@ import android.os.AsyncTask;
 
 
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.appindexing.Action;
+import com.google.android.gms.appindexing.AppIndex;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -45,13 +53,20 @@ enum Sport
     Volleyball,
     Skating
 }
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener {
 
     private GoogleMap mMap;
     private MobileServiceClient mClient;
     LocationManager locationManager;
     LatLng currLoc;
+    private EditText result;
+
     private Event_Manager eventManager;
+    /**
+     * ATTENTION: This was auto-generated to implement the App Indexing API.
+     * See https://g.co/AppIndexing/AndroidStudio for more information.
+     */
+    private GoogleApiClient client;
 
     private Sport currentlySelected = Sport.Soccer;
 
@@ -75,22 +90,23 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             e.printStackTrace();
         }
 
-	
+
         initToolBar();
 
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
     }
 
     @Override
-    public boolean onCreateOptionsMenu(android.view.Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_buttons, menu);
         initSportMenu(menu.findItem(R.id.action_change_sport));
         return true;
 
     }
 
-    private void initToolBar()
-    {
+    private void initToolBar() {
         Toolbar myToolbar = (Toolbar) findViewById(R.id.my_toolbar);
         myToolbar.showOverflowMenu();
         setSupportActionBar(myToolbar);
@@ -111,6 +127,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ImageSpinnerAdapter adapter=new ImageSpinnerAdapter(this,
                 R.layout.image_spinner_layout,R.id.txt,list);
         sp.setAdapter(adapter);
+        sp.setOnItemSelectedListener(this);
     }
 
     /**
@@ -150,6 +167,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 }
             }
         }
+        eventManager.getAllEvents();
+
         new LongOperation().execute("");
         //eventManager.createEvent("Hockey", "A brutal sport", currLoc.latitude, currLoc.longitude);
         //getEventBySport(Sport.Baseball);
@@ -164,14 +183,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
     {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
+
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+
+    {
+
 
         int result = item.getItemId();
         switch(result)
         {
             case R.id.action_change_location:
+              /* result = (EditText) findViewById(R.id.action_change_location);*/
+                EditText but_location = (EditText) findViewById(R.id.location_input);
+                if(but_location.getVisibility()== View.INVISIBLE) {
+                    but_location.setVisibility(View.VISIBLE);
+                }
+                else
+                    but_location.setVisibility(View.INVISIBLE);
+
                 return true;
+
             case R.id.action_change_sport:
                 return true;
             default:
@@ -182,11 +224,28 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         @Override
         protected String doInBackground(String... params) {
-            eventManager.getAllEvents();
             while(!eventManager.listSafe())
             {
-
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
+//            ArrayList<events> evens = eventManager.getEventList();
+//            for (events e : evens) {
+//                LatLng eloc = new LatLng(e.lati, e.longi);
+//                MarkerOptions mkrOpt = new MarkerOptions();
+//                if (mMap != null) {
+//                    mMap.addMarker(mkrOpt.position(eloc).title(e.type + ": " + e.description));
+//                }
+//            }
+            return "Executed";
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
             ArrayList<events> evens = eventManager.getEventList();
             for (events e : evens) {
                 LatLng eloc = new LatLng(e.lati, e.longi);
@@ -195,15 +254,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     mMap.addMarker(mkrOpt.position(eloc).title(e.type + ": " + e.description));
                 }
             }
-            return "Executed";
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-//            TextView txt = (TextView) findViewById(R.id.output);
-//            txt.setText("Executed"); // txt.setText(result);
-            // might want to change "executed" for the returned string passed
-            // into onPostExecute() but that is upto you
         }
 
         @Override
@@ -213,4 +263,43 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         protected void onProgressUpdate(Void... values) {}
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        client.connect();
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Maps Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://dagnss.com.parksfinder/http/host/path")
+        );
+        AppIndex.AppIndexApi.start(client, viewAction);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+        // ATTENTION: This was auto-generated to implement the App Indexing API.
+        // See https://g.co/AppIndexing/AndroidStudio for more information.
+        Action viewAction = Action.newAction(
+                Action.TYPE_VIEW, // TODO: choose an action type.
+                "Maps Page", // TODO: Define a title for the content shown.
+                // TODO: If you have web page content that matches this app activity's content,
+                // make sure this auto-generated web page URL is correct.
+                // Otherwise, set the URL to null.
+                Uri.parse("http://host/path"),
+                // TODO: Make sure this auto-generated app deep link URI is correct.
+                Uri.parse("android-app://dagnss.com.parksfinder/http/host/path")
+        );
+        AppIndex.AppIndexApi.end(client, viewAction);
+        client.disconnect();
+    }
 }
