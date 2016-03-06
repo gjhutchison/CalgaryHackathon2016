@@ -39,12 +39,17 @@ public class Event_Manager {
                     for(events event : result){
                         eList.add(event);
                     }
-                    setSafe(true);
                 }
                 catch(Exception e) {
                     Log.e("ERROR", "Failed to get all "+s+" Events");
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                setSafe(true);
+                return;
             }
         }.execute();
     }
@@ -64,7 +69,6 @@ public class Event_Manager {
                     result = mEventTable.execute().get();
                     eList.clear();
                     for(events event : result){
-                        eList.add(event);
 
                         double lat2 = event.lati;
                         double lon2 = event.longi;
@@ -80,12 +84,17 @@ public class Event_Manager {
                             eList.add(event);
                         }
                     }
-                    setSafe(true);
                 }
                 catch(Exception e) {
                     Log.e("ERROR", "Failed to get events within "+distance);
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                setSafe(true);
+                return;
             }
         }.execute();
     }
@@ -103,12 +112,71 @@ public class Event_Manager {
                     for(events event : result){
                         eList.add(event);
                     }
-                    setSafe(true);
                 }
                 catch(Exception e) {
                     Log.e("ERROR","Failed to get all Events");
                 }
                 return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                setSafe(true);
+                return;
+            }
+        }.execute();
+    }
+
+
+
+
+    public void GetClosestEvent(double lon,double lat){
+        final double lat1 = lat;
+        final double lon1 = lon;
+
+        setSafe(false);
+        new AsyncTask<Void, Void, Void>(){
+            @Override
+            protected Void doInBackground(Void... params){
+                MobileServiceList<events> result = null;
+                try{
+                    result = mEventTable.execute().get();
+                    events e = new events();
+                    eList.clear();
+                    double lowestDistance = -1;
+                    for(int i = 0;i<result.size();i++){
+                        double lat2 = result.get(i).lati;
+                        double lon2 = result.get(i).longi;
+
+                        double dLon = lon2-lon1;
+                        double dLat = lat2-lat2;
+
+                        double a = Math.pow(Math.sin(dLat/2),2)+Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(dLon/2),2);
+                        double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+                        double d = 6373 * c;
+                        d = Math.abs(d);
+
+                        if(lowestDistance == -1){
+                            lowestDistance = d;
+                        }
+
+                        if(d < lowestDistance){
+                            e = result.get(i);
+                            lowestDistance = d;
+                        }
+                    }
+                    eList.add(e);
+                }
+                catch(Exception e) {
+                    Log.e("ERROR", "Failed to get events with min distance");
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void v) {
+                setSafe(true);
+                return;
             }
         }.execute();
     }
