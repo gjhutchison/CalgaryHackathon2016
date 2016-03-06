@@ -71,6 +71,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private EditText result;
     private final LatLng CalgaryCentre = new LatLng( 51.045, -114.057222 );
 
+
     boolean loaded = false;
     private ArrayList<Marker> SoccerMarkers = new ArrayList<>();
     private ArrayList<Marker> TennisMarkers= new ArrayList<>();
@@ -364,14 +365,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             case R.id.action_change_location:
               /* result = (EditText) findViewById(R.id.action_change_location);*/
 
-                EditText but_location = ( EditText ) findViewById( R.id.location_input );
-                if ( but_location.getVisibility() == View.INVISIBLE )
-                {
-                    but_location.setVisibility( View.VISIBLE );
-                } else
-                {
-                    but_location.setVisibility( View.INVISIBLE );
-                }
+                Location l = mMap.getMyLocation(); // This is terrible
+                LatLng latLng = new LatLng(l.getLatitude(), l.getLongitude());
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
                 return true;
 
