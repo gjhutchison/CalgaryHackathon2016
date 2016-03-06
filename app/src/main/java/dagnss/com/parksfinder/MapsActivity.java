@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -43,7 +44,7 @@ enum Sport
     Volleyball,
     Skating
 }
-public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback, AdapterView.OnItemSelectedListener {
 
     private GoogleMap mMap;
     private MobileServiceClient mClient;
@@ -116,6 +117,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         ImageSpinnerAdapter adapter=new ImageSpinnerAdapter(this,
                 R.layout.image_spinner_layout,R.id.txt,list);
         sp.setAdapter(adapter);
+        sp.setOnItemSelectedListener(this);
     }
 
     /**
@@ -140,6 +142,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
         */
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int pos, long id)
+    {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent)
+    {
 
     }
 
