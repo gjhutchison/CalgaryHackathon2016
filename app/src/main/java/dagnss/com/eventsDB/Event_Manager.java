@@ -81,7 +81,7 @@ public class Event_Manager {
                         double lon2 = event.longi;
 
                         double dLon = lon2-lon1;
-                        double dLat = lat2-lat2;
+                        double dLat = lat2-lat1;
 
                         double a = Math.pow(Math.sin(dLat/2),2)+Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(dLon/2),2);
                         double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
@@ -164,7 +164,7 @@ public class Event_Manager {
                         double lon2 = result.get(i).longi;
 
                         double dLon = lon2-lon1;
-                        double dLat = lat2-lat2;
+                        double dLat = lat2-lat1;
 
                         double a = Math.pow(Math.sin(dLat/2),2)+Math.cos(lat1)*Math.cos(lat2)*Math.pow(Math.sin(dLon/2),2);
                         double c = 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
