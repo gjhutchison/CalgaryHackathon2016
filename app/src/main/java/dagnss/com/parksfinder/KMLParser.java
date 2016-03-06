@@ -6,9 +6,12 @@ import android.util.Log;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Polygon;
 import com.google.maps.android.kml.KmlContainer;
+import com.google.maps.android.kml.KmlGeometry;
 import com.google.maps.android.kml.KmlLayer;
 import com.google.maps.android.kml.KmlPlacemark;
+import com.google.maps.android.kml.KmlPolygon;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -141,8 +144,43 @@ public class KMLParser
         return shortened.substring( startIndex + 4, endIndex );
     }
 
-    public LatLng getLocation()
+    public LatLng getLocation( KmlPlacemark placemark )
     {
-        return new LatLng( 51, -114 );
+        KmlGeometry geometry = placemark.getGeometry();
+        KmlPolygon polygon;
+        if ( geometry instanceof KmlPolygon )
+        {
+            polygon = ( KmlPolygon ) geometry;
+        }
+        else
+        {
+            return new LatLng( 0, 0 );
+        }
+
+        ArrayList<LatLng> boundaries = polygon.getOuterBoundaryCoordinates();
+
+        double maxLat = -91;
+        double maxLong = -181;
+        double minLat = 91;
+        double minLong = 181;
+
+        for( LatLng elem : boundaries )
+        {
+            if( elem.latitude < minLat )
+                minLat = elem.latitude;
+            if( elem.longitude < minLong )
+                minLong = elem.longitude;
+
+            if( elem.latitude > maxLat )
+                maxLat = elem.latitude;
+            if( elem.longitude > maxLong )
+                maxLong = elem.longitude;
+        }
+
+        double avgLat = ( minLat + maxLat ) / 2;
+        double avgLong = ( minLong + maxLong ) / 2;
+        LatLng avgPos = new LatLng( avgLat, avgLong );
+
+        return avgPos;
     }
 }

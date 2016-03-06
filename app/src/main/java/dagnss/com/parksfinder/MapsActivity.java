@@ -37,12 +37,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.kml.KmlPlacemark;
 import com.microsoft.windowsazure.mobileservices.*;
 
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 enum Sport
 {
@@ -66,6 +69,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private final LatLng CalgaryCentre = new LatLng( 51.045, -114.057222 );
 
     boolean loaded = false;
+    private ArrayList<Marker> SoccerMarkers;
+    private ArrayList<Marker> TennisMarkers;
+    private ArrayList<Marker> BaseballMarkers;
+    private ArrayList<Marker> FrisbeeMarkers;
+    private ArrayList<Marker> IceSkateMarkers;
+    private ArrayList<Marker> BasketballMarkers;
+    private ArrayList<Marker> VolleyballMarkers;
+
+    private HashMap<Sport, ArrayList<Marker>> sportsMap;
+
+
     private Event_Manager eventManager;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -140,6 +154,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder( this ).addApi( AppIndex.API ).build();
+
+        sportsMap.put( Sport.Soccer, SoccerMarkers );
+        sportsMap.put( Sport.Baseball, BaseballMarkers );
+        sportsMap.put( Sport.Basketball, BasketballMarkers );
+        sportsMap.put( Sport.Frisbee, FrisbeeMarkers );
+        sportsMap.put( Sport.Skating, IceSkateMarkers );
+        sportsMap.put( Sport.Tennis, TennisMarkers );
+        sportsMap.put( Sport.Volleyball, VolleyballMarkers );
     }
 
     @Override
@@ -222,7 +244,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker in Sydney and move the camera
         int inputRes = R.raw.calgary_sports_surfaces;
 
-        if(initialLoad)
+        if ( initialLoad )
         {
             parser = new KMLParser( mMap, getApplicationContext() );
             initialLoad = false;
@@ -264,8 +286,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected( MenuItem item )
 
     {
-
-
         int result = item.getItemId();
         switch ( result )
         {
@@ -372,5 +392,66 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
         AppIndex.AppIndexApi.end( client, viewAction );
         client.disconnect();
+    }
+
+    public void toggleVisiblity( Sport sport )
+    {
+        ArrayList<Marker> sportList = sportsMap.get( sport );
+
+        if ( sportList.isEmpty() )
+        {
+            buildMarkerList( sport, sportList );
+        }
+        else
+        {
+            for ( Marker elem : sportList )
+            {
+                elem.setVisible( !elem.isVisible() );
+            }
+        }
+    }
+
+    private void buildMarkerList( Sport sport, ArrayList<Marker> list )
+    {
+        String sportType = "";
+        switch ( sport )
+        {
+            case Soccer:
+                sportType = "SOCCER";
+                break;
+            case Tennis:
+                sportType = "TENNIS";
+                break;
+            case Baseball:
+                sportType = "BALL DIAMOND DUGOUT";
+                break;
+            case Basketball:
+                sportType = "BASKETBALL";
+                break;
+            case Frisbee:
+                sportType = "ULTIMATE FRISBEE";
+                break;
+            case Volleyball:
+                sportType = "VOLLEYBALL";
+                break;
+            case Skating:
+                sportType = "ICE AREA";
+                break;
+        }
+        if ( sportType.isEmpty() )
+        {
+            return;
+        }
+
+        ArrayList<KmlPlacemark> placemarks = parser.getFacilities( sportType );
+
+        for( KmlPlacemark location : placemarks )
+        {
+            LatLng pos = parser.getLocation( location );
+            MarkerOptions mkrOpt = new MarkerOptions();
+            Marker newMarker = mMap.addMarker( mkrOpt.position(pos) );
+
+            list.add( newMarker );
+        }
     }
 }
