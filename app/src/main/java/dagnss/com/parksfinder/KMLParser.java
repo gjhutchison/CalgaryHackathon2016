@@ -39,19 +39,17 @@ public class KMLParser
         m_mapContext = mapContext;
     }
 
-    public boolean loadKML( int inputRes )
+    public KmlLayer loadKML( int inputRes )
     {
         KmlLayer mainLayer;
         try
         {
             mainLayer = new KmlLayer( m_map, inputRes, m_mapContext );
-            mainLayer.addLayerToMap();
-
             Log.i( "success", "Loaded KML Layer successfully." );
         } catch ( Exception e )
         {
             Log.e( "error", e.getMessage() );
-            return false;
+            return null;
         }
         KmlContainer mainDoc = mainLayer.getContainers().iterator().next();
         KmlContainer mainContainer = mainDoc.getContainers().iterator().next();
@@ -62,12 +60,10 @@ public class KMLParser
         {
             placemarkList.add( elem );
         }
+
         populateLists( placemarkList );
 
-        populateLists( mainLayer.getPlacemarks() );
-
-        mainLayer.removeLayerFromMap();
-        return true;
+        return mainLayer;
     }
 
     public void populateLists( Iterable<KmlPlacemark> placemarks )
