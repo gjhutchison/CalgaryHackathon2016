@@ -23,6 +23,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.os.AsyncTask;
 
@@ -37,12 +38,15 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.maps.android.kml.KmlPlacemark;
 import com.microsoft.windowsazure.mobileservices.*;
 
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 enum Sport
 {
@@ -65,6 +69,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private EditText result;
     private final LatLng CalgaryCentre = new LatLng( 51.045, -114.057222 );
 
+    boolean loaded = false;
+    private ArrayList<Marker> SoccerMarkers = new ArrayList<>();
+    private ArrayList<Marker> TennisMarkers= new ArrayList<>();
+    private ArrayList<Marker> BaseballMarkers= new ArrayList<>();
+    private ArrayList<Marker> FrisbeeMarkers= new ArrayList<>();
+    private ArrayList<Marker> IceSkateMarkers= new ArrayList<>();
+    private ArrayList<Marker> BasketballMarkers= new ArrayList<>();
+    private ArrayList<Marker> VolleyballMarkers= new ArrayList<>();
+
+    private HashMap<Sport, ArrayList<Marker>> sportsMap;
+
+
     private Event_Manager eventManager;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -86,6 +102,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .findFragmentById( R.id.map );
         mapFragment.getMapAsync( this );
 
+        sportsMap = new HashMap<>();
 	    try{
             mClient = new MobileServiceClient(
                     "https://sportyevents.azure-mobile.net/",
@@ -122,9 +139,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                     @Override
                     public void onMyLocationChange(Location arg0) {
                         // TODO Auto-generated method stub
-                        LatLng latLng = new LatLng(arg0.getLatitude(), arg0.getLongitude());
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-                        //mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                        if(!loaded) {
+                            LatLng latLng = new LatLng(arg0.getLatitude(), arg0.getLongitude());
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                            //mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                            loaded = true;
+                        }
                     }
                 });
 
@@ -136,6 +156,14 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder( this ).addApi( AppIndex.API ).build();
+
+        sportsMap.put( Sport.Soccer, SoccerMarkers );
+        sportsMap.put( Sport.Baseball, BaseballMarkers );
+        sportsMap.put( Sport.Basketball, BasketballMarkers );
+        sportsMap.put( Sport.Frisbee, FrisbeeMarkers );
+        sportsMap.put( Sport.Skating, IceSkateMarkers );
+        sportsMap.put( Sport.Tennis, TennisMarkers );
+        sportsMap.put( Sport.Volleyball, VolleyballMarkers );
     }
 
     @Override
@@ -219,7 +247,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         // Add a marker in Sydney and move the camera
         int inputRes = R.raw.calgary_sports_surfaces;
 
-        if(initialLoad)
+        if ( initialLoad )
         {
             parser = new KMLParser( mMap, getApplicationContext() );
             initialLoad = false;
@@ -234,7 +262,37 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     @Override
     public void onItemSelected( AdapterView<?> parent, View view, int pos, long id )
     {
-
+        switch(pos)
+        {
+            case 0:
+                toggleVisibility(Sport.Soccer);
+                currentlySelected = Sport.Soccer;
+                break;
+            case 1:
+                toggleVisibility(Sport.Baseball);
+                currentlySelected = Sport.Baseball;
+                break;
+            case 2:
+                toggleVisibility(Sport.Tennis);
+                currentlySelected = Sport.Tennis;
+                break;
+            case 3:
+                toggleVisibility(Sport.Frisbee);
+                currentlySelected = Sport.Frisbee;
+                break;
+            case 4:
+                toggleVisibility(Sport.Basketball);
+                currentlySelected = Sport.Basketball;
+                break;
+            case 5:
+                toggleVisibility(Sport.Volleyball);
+                currentlySelected = Sport.Volleyball;
+                break;
+            case 6:
+                toggleVisibility(Sport.Skating);
+                currentlySelected = Sport.Skating;
+                break;
+        }
     }
 
     @Override
@@ -247,8 +305,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected( MenuItem item )
 
     {
-
-
         int result = item.getItemId();
         switch ( result )
         {
@@ -355,5 +411,70 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         );
         AppIndex.AppIndexApi.end( client, viewAction );
         client.disconnect();
+    }
+
+    public void toggleVisibility( Sport sport )
+    {
+        ArrayList<Marker> sportList = sportsMap.get( sport );
+        for(Marker m : sportsMap.get(currentlySelected))
+        {
+            m.setVisible(false);
+        }
+
+        if ( sportList.isEmpty() )
+        {
+            buildMarkerList( sport, sportList );
+        }
+        else
+        {
+            for ( Marker elem : sportList )
+            {
+                elem.setVisible( !elem.isVisible() );
+            }
+        }
+    }
+
+    private void buildMarkerList( Sport sport, ArrayList<Marker> list )
+    {
+        String sportType = "";
+        switch ( sport )
+        {
+            case Soccer:
+                sportType = "SOCCER";
+                break;
+            case Tennis:
+                sportType = "TENNIS";
+                break;
+            case Baseball:
+                sportType = "BALL DIAMOND DUGOUT";
+                break;
+            case Basketball:
+                sportType = "BASKETBALL";
+                break;
+            case Frisbee:
+                sportType = "ULTIMATE FRISBEE";
+                break;
+            case Volleyball:
+                sportType = "VOLLEYBALL";
+                break;
+            case Skating:
+                sportType = "ICE AREA";
+                break;
+        }
+        if ( sportType.isEmpty() )
+        {
+            return;
+        }
+
+        ArrayList<KmlPlacemark> placemarks = parser.getFacilities( sportType );
+
+        for( KmlPlacemark location : placemarks )
+        {
+            LatLng pos = parser.getLocation( location );
+            MarkerOptions mkrOpt = new MarkerOptions();
+            Marker newMarker = mMap.addMarker( mkrOpt.position(pos) );
+
+            list.add( newMarker );
+        }
     }
 }
