@@ -9,6 +9,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.support.v4.app.ActivityCompat;
 import android.net.Uri;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -94,6 +95,39 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }catch(Exception e){
             e.printStackTrace();
         }
+
+        // Do a null check to confirm that we have not already instantiated the map.
+        if (mMap == null) {
+            // Try to obtain the map from the SupportMapFragment.
+            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+                    .getMap();
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+            // Check if we were successful in obtaining the map.
+            if (mMap != null) {
+
+
+                mMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+
+                    @Override
+                    public void onMyLocationChange(Location arg0) {
+                        // TODO Auto-generated method stub
+                        LatLng latLng = new LatLng(arg0.getLatitude(), arg0.getLongitude());
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                        //mMap.addMarker(new MarkerOptions().position(new LatLng(arg0.getLatitude(), arg0.getLongitude())).title("It's Me!"));
+                    }
+                });
+
+            }}
 
 
         initToolBar();
@@ -218,6 +252,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         {
             case R.id.action_change_location:
               /* result = (EditText) findViewById(R.id.action_change_location);*/
+
                 EditText but_location = ( EditText ) findViewById( R.id.location_input );
                 if ( but_location.getVisibility() == View.INVISIBLE )
                 {
